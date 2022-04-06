@@ -1,0 +1,4 @@
+# Ignore .dat files
+*.dat
+ray_results/
+*.csv
