@@ -11,6 +11,7 @@ import math as m
 from robotClass_simulateObs import Robot,LaserScan
 from draw_background import draw_background
 from numpy.random import uniform
+from numpy import append
 
 grid_num = 0; num_iterations = 1000
 for grid_num in range(0,251):
@@ -46,10 +47,10 @@ for grid_num in range(0,251):
         #Collect data
         observations = robot.collect_observations(point_cloud)
         if len(observations) == obs:
-            observation_data.append(robot.collect_observations(point_cloud))
+            observation_data.append(append(observations,grid_num))
         #observations stored as [distance_readings,self.x,self.y,goal_dist_x,goal_dist_y,force_x,force_y]
     
-    with open("ObsRecordUniformRandom.csv", "a", newline="") as f:
+    with open("ObsRecordUniformRandom_v2.csv", "a", newline="") as f:
         writer = csv.writer(f)
         writer.writerows(observation_data)
     f.close()

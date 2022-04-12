@@ -15,11 +15,11 @@ import numpy as np
 from sklearn import preprocessing
 
 #DNN
-filename = os.getcwd() + "\\ObsRecordUniformRandom.csv"
+filename = os.getcwd() + "\\ObsRecordUniformRandom_v2.csv"
 df = pd.read_csv(filename,header=None)
 #observations stored as [distance_readings,self.x,self.y,goal_dist_x,goal_dist_y,force_x,force_y]
 lidar_list = ["Lidar"+str(x) for x in range(0,32)]
-headers = lidar_list + ["xPos","yPos","goalDistX","goalDistY","forceX","forceY"]
+headers = lidar_list + ["xPos","yPos","goalDistX","goalDistY","forceX","forceY","world"]
 df.columns = headers
 
 #Normalize the results
@@ -27,9 +27,10 @@ x = df.values #returns a numpy array
 min_max_scaler = preprocessing.MinMaxScaler()
 x_scaled = min_max_scaler.fit_transform(x)
 dfNorm = pd.DataFrame(x_scaled)
+dfNorm.columns = headers
 
-X = np.array(dfNorm.iloc[:,0:-2])
-y = np.array(dfNorm.iloc[:,-2:])
+X = np.array(dfNorm.iloc[:,0:-3])
+y = np.array(dfNorm.iloc[:,-3:-1])
 
 # define the keras model
 model = Sequential()
