@@ -15,7 +15,7 @@ import numpy as np
 from sklearn import preprocessing
 
 #DNN
-filename = os.getcwd() + "\\ObsRecordUniformRandom_v2.csv"
+filename = os.getcwd() + "\\ObsRecordUniformRandom_v3.csv"
 df = pd.read_csv(filename,header=None)
 #observations stored as [distance_readings,self.x,self.y,goal_dist_x,goal_dist_y,force_x,force_y]
 lidar_list = ["Lidar"+str(x) for x in range(0,32)]
@@ -34,7 +34,7 @@ y = np.array(dfNorm.iloc[:,-3:-1])
 
 # define the keras model
 model = Sequential()
-model.add(Dense(64, input_dim=len(headers)-2, activation='relu'))
+model.add(Dense(64, input_dim=len(headers)-3, activation='relu'))
 model.add(Dense(256, activation='relu'))
 model.add(Dense(256, activation='relu'))
 model.add(Dense(2, activation='sigmoid'))

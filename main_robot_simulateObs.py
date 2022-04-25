@@ -11,7 +11,7 @@ import math as m
 from robotClass_simulateObs import Graphics,Robot,LaserScan,distance
 from draw_background import draw_background
 f = 'grid_files/grid_0.npy'
-mode = 'force' #Use 'human' for human play
+mode = 'force' #Use 'human' for human play, 'force' for Potential field, and anything else for random walk
 
 #Define starting criteria
 map_dims = (900,1200)  
