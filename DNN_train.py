@@ -19,7 +19,7 @@ filename = os.getcwd() + "\\ObsRecordUniformRandom_v3.csv"
 df = pd.read_csv(filename,header=None)
 #observations stored as [distance_readings,self.x,self.y,goal_dist_x,goal_dist_y,force_x,force_y]
 lidar_list = ["Lidar"+str(x) for x in range(0,32)]
-headers = lidar_list + ["xPos","yPos","goalDistX","goalDistY","forceX","forceY","world"]
+headers = lidar_list + ["xPos","yPos","goalDist","forceX","forceY","world"]
 df.columns = headers
 
 #Normalize the results
