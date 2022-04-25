@@ -8,10 +8,10 @@ Created on Tue Mar  8 08:44:09 2022
 import pygame
 import csv
 import math as m
-from robotClass_simulateObs import Graphics,Robot,LaserScan
+from robotClass_simulateObs import Graphics,Robot,LaserScan,distance
 from draw_background import draw_background
 f = 'grid_files/grid_0.npy'
-mode = 'human' #Use 'human' for human play
+mode = 'force' #Use 'human' for human play
 
 #Define starting criteria
 map_dims = (900,1200)  
@@ -24,7 +24,7 @@ gfx = Graphics(map_dims,'pictures/rosbot.png','pictures/starPNG.png',map_matrix,
 pygame.init()
 
 #Initalize robot
-start = (200,200)
+start = (100,500)
 robot = Robot(start,0.01*3779.52,goal)
 
 #Initialize sensor
@@ -65,8 +65,12 @@ while running:# and frame<10000:
     gfx.draw_map()
     
     point_cloud,ray_points = laser.sense_obstacles(robot.x,robot.y,robot.heading)
+    observations = robot.collect_observations(point_cloud)
     if mode == 'human':
         robot.play(keys,dt) #Move robot (user)
+        robot.kinematics(dt)
+    elif mode == 'force':
+        robot.move_forces(observations[-2:])
         robot.kinematics(dt)
     else:        
         robot.kinematics(dt) #Move robot (randomly)
@@ -78,15 +82,16 @@ while running:# and frame<10000:
     gfx.draw_lidar_rays(ray_points)
     
     #Collect data
-    observations = robot.collect_observations(point_cloud)
+    
     observation_data.append(robot.collect_observations(point_cloud))
     #observations stored as [distance_readings,self.x,self.y,goal_dist_x,goal_dist_y,force_x,force_y]
-    
+    if distance((robot.x,robot.y),goal)<70:
+        running = False
     pygame.display.update()
     
     
 pygame.quit()
-with open("obsHumanOrRandomWalk.csv", "w", newline="") as f:
-    writer = csv.writer(f)
-    writer.writerows(observation_data)
-f.close()
+# with open("obsHumanOrRandomWalk.csv", "w", newline="") as f:
+#     writer = csv.writer(f)
+#     writer.writerows(observation_data)
+# f.close()

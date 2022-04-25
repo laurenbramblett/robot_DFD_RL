@@ -20,7 +20,7 @@ class Robot:
         self.x = startpos[0]
         self.y = startpos[1]
         self.heading = 0
-        
+        self.kp = 0.5
         self.lin_v = 0.01*self.m2p
         self.ang_v = 0
         self.maxspeed = 0.02*self.m2p
@@ -64,11 +64,15 @@ class Robot:
             self.ang_v = -self.minspeed
         if keys[0]:
             self.lin_v = self.maxspeed  
+    def move_forces(self,forces):
+        force_x = forces[0]
+        force_y = forces[1]
+        self.ang_v = m.atan2(force_y,force_x)-self.heading
         
     def kinematics(self,dt):
         self.x += (self.lin_v)*m.cos(self.heading)*dt
-        self.y-= (self.lin_v)*m.sin(self.heading)*dt
-        self.heading += (self.ang_v)/self.w*dt
+        self.y -= (self.lin_v)*m.sin(self.heading)*dt
+        self.heading += (self.ang_v)*self.kp*dt
         
         if self.heading>2*m.pi or self.heading<-2*m.pi:
             self.heading = 0
@@ -97,19 +101,18 @@ class Robot:
         obs_forces_x = []
         obs_forces_y = []
         for idx in range(0,len(distance_readings)):
-            if distance_readings[idx]<70:
+            if distance_readings[idx]<100:
                 obs_forces_x.append((point_cloud[idx][0]-self.x)/distance_readings[idx]**3)
-                obs_forces_y.append((point_cloud[idx][1]-self.y)/distance_readings[idx]**3)
+                obs_forces_y.append((-point_cloud[idx][1]+self.y)/distance_readings[idx]**3)
         obs_force_x = (0 if len(obs_forces_x)<1 else sum(obs_forces_x)/len(obs_forces_x))
         obs_force_y = (0 if len(obs_forces_y)<1 else sum(obs_forces_y)/len(obs_forces_y))
         goal_force_x = (self.goal[0]-self.x)/goal_dist**3
-        goal_force_y = (self.goal[1]-self.y)/goal_dist**3
-        force_x = -100*obs_force_x+2.5*goal_force_x
-        force_y = -100*obs_force_y+2.5*goal_force_y
+        goal_force_y = (-self.goal[1]+self.y)/goal_dist**3
+        force_x = -10*obs_force_x+2.5*goal_force_x
+        force_y = -10*obs_force_y+2.5*goal_force_y
         if len(point_cloud)>0:
             observations = np.concatenate((distance_readings,
-                                           [self.x,self.y,self.goal[0]-self.x,
-                                            self.goal[1]-self.y,force_x,force_y]))
+                                           [self.x,self.y,goal_dist,force_x,force_y]))
         return observations
             
 class Graphics:
