@@ -11,9 +11,11 @@ import math as m
 from robotClass_simulateObs import Graphics,Robot,LaserScan,distance
 from draw_background import draw_background
 from tensorflow import keras
+from tensorflow.compat.v1 import disable_eager_execution
 import joblib
 import numpy as np
-f = 'grid_files/grid_5.npy'
+disable_eager_execution()
+f = 'grid_files/grid_1.npy'
 mode = 'dnn' #Use 'human' for human play, 'force' for Potential field, ...
 #'dnn' for predicting using a DNN and anything else for random walk
 
