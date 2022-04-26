@@ -6,12 +6,15 @@ Created on Tue Mar  8 08:44:09 2022
 """
 
 import pygame
-import csv
+# import csv
 import math as m
 from robotClass_simulateObs import Graphics,Robot,LaserScan,distance
 from draw_background import draw_background
-f = 'grid_files/grid_0.npy'
-mode = 'force' #Use 'human' for human play, 'force' for Potential field, and anything else for random walk
+from tensorflow import keras
+import joblib
+import numpy as np
+f = 'grid_files/grid_5.npy'
+mode = 'dnn' #Use 'human' for human play, 'force' for Potential field, and anything else for random walk
 
 #Define starting criteria
 map_dims = (900,1200)  
@@ -28,7 +31,7 @@ start = (100,500)
 robot = Robot(start,0.01*3779.52,goal)
 
 #Initialize sensor
-sensor_range = 250,m.radians(180/2)
+sensor_range = 250,m.radians(180)
 angle_space = m.pi/16
 laser = LaserScan(sensor_range,angle_space,map_matrix)
 
@@ -37,6 +40,10 @@ frame = 0
 dt = 0.01
 observation_data = []
 keys = [False, False, False, False]
+if mode == 'dnn':
+    model = keras.models.load_model('force_model_ang')
+    scaler = joblib.load('min_max_scaler_ang') 
+    
 while running:# and frame<10000:
     frame += 1
 
@@ -70,7 +77,16 @@ while running:# and frame<10000:
         robot.play(keys,dt) #Move robot (user)
         robot.kinematics(dt)
     elif mode == 'force':
-        robot.move_forces(observations[-2:])
+        force = observations[-2:]
+        angle = m.atan2(force[1],force[0])
+        robot.move_forces(angle)
+        robot.kinematics(dt)
+    elif mode == 'dnn':       
+        obs = scaler.transform((np.concatenate((observations,[1]))).reshape(1,-1))
+        tmp = np.tile(np.transpose(obs[0][:-2]), (64,1))
+        angle = model.predict(tmp)[0,:]
+        f_inv = scaler.inverse_transform(np.concatenate((obs[0][:-2],angle,[1])).reshape(1,-1))
+        robot.move_forces(f_inv[0,-2])#f_inv[:,-3:-1][0])
         robot.kinematics(dt)
     else:        
         robot.kinematics(dt) #Move robot (randomly)

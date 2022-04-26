@@ -14,7 +14,7 @@ from numpy.random import uniform
 from numpy import append
 
 grid_num = 0; num_iterations = 1000
-for grid_num in range(0,251):
+for grid_num in range(0,100):
     print(grid_num)
     f = 'grid_files/grid_%d.npy' % grid_num
     
@@ -28,7 +28,7 @@ for grid_num in range(0,251):
     #Initialize sensor
     sensor_range = 250,m.radians(180)
     angle_space = m.pi/16
-    obs = round(sensor_range[1]*2/angle_space)+5 #see below observation_data.append for addtl 6
+    obs = round(sensor_range[1]*2/angle_space)+3 #see below observation_data.append for addtl 6
     laser = LaserScan(sensor_range,angle_space,map_matrix)
     
     frame = 0
@@ -48,9 +48,9 @@ for grid_num in range(0,251):
         observations = robot.collect_observations(point_cloud)
         if len(observations) == obs:
             observation_data.append(append(observations,grid_num))
-        #observations stored as [distance_readings,self.x,self.y,goal_dist,force_x,force_y]
+        #observations stored as [distance_readings,goal_dist,force_angle]
     
-    with open("ObsRecordUniformRandom_v3.csv", "a", newline="") as f:
+    with open("ObsRecordUniformRandom_v5.csv", "a", newline="") as f:
         writer = csv.writer(f)
         writer.writerows(observation_data)
     f.close()

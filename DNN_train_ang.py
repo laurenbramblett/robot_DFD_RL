@@ -16,11 +16,11 @@ from sklearn import preprocessing
 import joblib
 
 #DNN
-filename = os.getcwd() + "\\ObsRecordUniformRandom_v4.csv"
+filename = os.getcwd() + "\\ObsRecordUniformRandom_v5.csv"
 df = pd.read_csv(filename,header=None)
 #observations stored as [distance_readings,goal_dist,goal_ang,force_x,force_y]
 lidar_list = ["Lidar"+str(x) for x in range(0,32)]
-headers = lidar_list + ["goalDist","goalAng","forceX","forceY","world"]
+headers = lidar_list + ["goalDist","goalAng","forceAng","world"]
 df.columns = headers
 
 #Normalize the results
@@ -30,21 +30,21 @@ x_scaled = min_max_scaler.fit_transform(x)
 dfNorm = pd.DataFrame(x_scaled)
 dfNorm.columns = headers
 
-X = np.array(dfNorm.iloc[:,0:-3])
-y = np.array(dfNorm.iloc[:,-3:-1])
+X = np.array(dfNorm.iloc[:,0:-2])
+y = np.array(dfNorm.iloc[:,-2:-1])
 
 # define the keras model
 model = Sequential()
-model.add(Dense(64, input_dim=len(headers)-3, activation='relu'))
+model.add(Dense(64, input_dim=len(headers)-2, activation='relu'))
 model.add(Dense(256, activation='relu'))
 model.add(Dense(256, activation='relu'))
-model.add(Dense(2, activation='linear'))
+model.add(Dense(1, activation='linear'))
 
 # compile the keras model
 model.compile(loss='mean_squared_error', optimizer='adam', metrics=['mse'])
 # fit the keras model on the dataset
-model.fit(X, y, epochs=100, batch_size=1)
+model.fit(X, y, epochs=100, batch_size=64)
 _, accuracy = model.evaluate(X, y)
 print('Accuracy: %.7f' % (accuracy*100))
-model.save('force_model')
-joblib.dump(min_max_scaler, 'min_max_scaler')
+model.save('force_model_ang')
+joblib.dump(min_max_scaler, 'min_max_scaler_ang')

@@ -64,10 +64,8 @@ class Robot:
             self.ang_v = -self.minspeed
         if keys[0]:
             self.lin_v = self.maxspeed  
-    def move_forces(self,forces):
-        force_x = forces[0]
-        force_y = forces[1]
-        self.ang_v = m.atan2(force_y,force_x)-self.heading
+    def move_forces(self,angle):
+        self.ang_v = angle-self.heading
         
     def kinematics(self,dt):
         self.x += (self.lin_v)*m.cos(self.heading)*dt
@@ -98,6 +96,7 @@ class Robot:
         observations = []
         closest_obs,distance_readings = self.check_obstacles(point_cloud)
         goal_dist = distance([self.x,self.y],self.goal)
+        goal_ang = m.atan2(-self.goal[1]+self.y,self.goal[0]-self.x)
         obs_forces_x = []
         obs_forces_y = []
         for idx in range(0,len(distance_readings)):
@@ -110,9 +109,10 @@ class Robot:
         goal_force_y = (-self.goal[1]+self.y)/goal_dist**3
         force_x = -10*obs_force_x+2.5*goal_force_x
         force_y = -10*obs_force_y+2.5*goal_force_y
+        force_ang = m.atan2(force_y,force_x)
         if len(point_cloud)>0:
             observations = np.concatenate((distance_readings,
-                                           [self.x,self.y,goal_dist,force_x,force_y]))
+                                           [goal_dist,goal_ang,force_ang]))
         return observations
             
 class Graphics:
