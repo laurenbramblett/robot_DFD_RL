@@ -14,7 +14,8 @@ from tensorflow import keras
 import joblib
 import numpy as np
 f = 'grid_files/grid_5.npy'
-mode = 'dnn' #Use 'human' for human play, 'force' for Potential field, and anything else for random walk
+mode = 'dnn' #Use 'human' for human play, 'force' for Potential field, ...
+#'dnn' for predicting using a DNN and anything else for random walk
 
 #Define starting criteria
 map_dims = (900,1200)  
