@@ -2,3 +2,6 @@
 *.dat
 ray_results/
 *.csv
+
+.ipynb_checkpoints/
+*.pyc
