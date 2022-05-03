@@ -14,7 +14,7 @@ from numpy.random import uniform
 from numpy import append
 
 grid_num = 0; num_iterations = 1000
-for grid_num in range(0,100):
+for grid_num in range(0,300):
     print(grid_num)
     f = 'grid_files/grid_%d.npy' % grid_num
     
@@ -50,7 +50,7 @@ for grid_num in range(0,100):
             observation_data.append(append(observations,grid_num))
         #observations stored as [distance_readings,goal_dist,force_angle]
     
-    with open("ObsRecordUniformRandom_v5.csv", "a", newline="") as f:
+    with open("ObsRecordUniformRandom_v6.csv", "a", newline="") as f:
         writer = csv.writer(f)
         writer.writerows(observation_data)
     f.close()
