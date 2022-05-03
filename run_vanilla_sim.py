@@ -81,5 +81,5 @@ def run_vanilla_sim(model,scaler,world,drawing):
 #Example
 model = keras.models.load_model('force_model_ang') 
 scaler = joblib.load('min_max_scaler_ang')
-frame,success = run_vanilla_sim(model, scaler, 1, True) #Set drawing to false if no visual necessary
+frame,success = run_vanilla_sim(model, scaler, 1, False) #Set drawing to false if no visual necessary
 print("Num Control Iterations: {}\nSuccess: {}".format(frame,success))
