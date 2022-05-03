@@ -1,9 +1,13 @@
 gym==0.19.0
+joblib==1.0.1
 keras==2.8.0
 matplotlib==3.3.4
 nn==0.1.1
 numpy==1.20.1
 opencv_python==4.5.5.62
+pandas==1.2.4
+Pillow==9.1.0
 pygame==2.1.2
 ray==1.11.0
+scikit_learn==1.0.2
 tensorflow==2.8.0
