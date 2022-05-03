@@ -15,7 +15,7 @@ import joblib
 import numpy as np
 disable_eager_execution()
 
-def run_vanilla_sim(model,scaler,world,drawing):
+def run_vanilla_sim(model,scaler,batch_size,world,drawing):
     f = 'grid_files/grid_%d.npy' % world
     #Define starting criteria
     map_dims = (900,1200)  
@@ -51,11 +51,11 @@ def run_vanilla_sim(model,scaler,world,drawing):
         point_cloud,ray_points = laser.sense_obstacles(robot.x,robot.y,robot.heading)
         observations = robot.collect_observations(point_cloud)
       
-        obs = scaler.transform((np.concatenate((observations,[1]))).reshape(1,-1))
-        tmp = np.tile(np.transpose(obs[0][:-2]), (64,1))
+        obs = scaler.transform(observations.reshape(1,-1))
+        tmp = np.tile(np.transpose(obs), (batch_size,1))
         angle = model.predict(tmp)[0,:]
-        f_inv = scaler.inverse_transform(np.concatenate((obs[0][:-2],angle,[1])).reshape(1,-1))
-        robot.move_forces(f_inv[0,-2])#f_inv[:,-3:-1][0])
+        f_inv = scaler.inverse_transform(np.concatenate((obs[0],angle)).reshape(1,-1))
+        robot.move_forces(f_inv[0,-1])#f_inv[:,-3:-1][0])
         robot.kinematics(dt)
         
         #Draw sensor data & robot
@@ -78,8 +78,9 @@ def run_vanilla_sim(model,scaler,world,drawing):
     pygame.quit()
     return frame, success
 
-#Example
-model = keras.models.load_model('force_model_ang') 
-scaler = joblib.load('min_max_scaler_ang')
-frame,success = run_vanilla_sim(model, scaler, 1, False) #Set drawing to false if no visual necessary
-print("Num Control Iterations: {}\nSuccess: {}".format(frame,(True if success else False)))
+# #Example
+# if __name__ == "__main__":
+#     model = keras.models.load_model('force_model_ang') 
+#     scaler = joblib.load('min_max_scaler_ang')
+#     frame,success = run_vanilla_sim(model, scaler, 64, 1, False) #Set drawing to false if no visual necessary
+#     print("Num Control Iterations: {}\nSuccess: {}".format(frame,(True if success else False)))
