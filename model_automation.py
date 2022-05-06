@@ -12,24 +12,30 @@ from tensorflow.keras.optimizers import SGD
 from run_vanilla_sim import run_vanilla_sim
 
 # from keras.wrappers.scikit_learn import KerasClassifier #Deprecated
-from scikeras.wrappers import KerasClassifier, KerasRegressor
+# from scikeras.wrappers import KerasClassifier, KerasRegressor
 
 
 import seaborn as sns
 import matplotlib.pyplot as plt
 plt.style.use('bmh')
+from tensorflow.compat.v1 import disable_eager_execution
+disable_eager_execution()
 
 
+draw=True
+train_frac=0.8 #fraction of data to train on
 
-draw=False
-train_frac=2/3 #fraction of data to train on
-
-batch_sizes=[32,64,128]
+batch_sizes=[64,128]
 HL_scales=[1,2,4]
-optimizers=['SGD','Adam']
-learning_rates=[0.1,0.01,0.001]
+optimizers=['Adam']
+learning_rates=[0.01,0.001]
 epochs=100
 
+batch_sizes=[128]
+HL_scales=[1]
+optimizers=['Adam']
+learning_rates=[0.01]
+epochs=10
 
 def createNN(layer_params=[],compile_params=[[],{'loss':'mean_squared_error', 'optimizer':'adam', 'metrics':['mse']}],model=Sequential):
     """Construct an arbitrary Keras layered model
@@ -156,7 +162,7 @@ for b_sz in batch_sizes:
 
                 _,test_score=model.evaluate(Xtst,ytst)
 
-                pf_sum,avg_ctrl_iters,pf_by_world,ctrl_iters_by_world=simulate_model(model,test_world_ids,min_max_scaler,b_sz,draw)
+                pf_sum,avg_ctrl_iters,pf_by_world,ctrl_iters_by_world=simulate_model(model,[1],min_max_scaler,b_sz,draw)
 
                 results[test_params]={'layers':layers,'model':model,
                                       'training score':trn_score,'test score':test_score,
