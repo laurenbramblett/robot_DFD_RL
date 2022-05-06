@@ -80,9 +80,9 @@ while running:# and frame<10000:
         robot.play(keys,dt) #Move robot (user)
         robot.kinematics(dt)
     elif mode == 'force':
-        force = observations[-2:]
-        angle = m.atan2(force[1],force[0])
-        robot.move_forces(angle)
+        force = float(observations[-1:])
+        #angle = m.atan2(force[1],force[0])
+        robot.move_forces(force)
         robot.kinematics(dt)
     elif mode == 'dnn':       
         obs = scaler.transform((np.concatenate((observations,[1]))).reshape(1,-1))

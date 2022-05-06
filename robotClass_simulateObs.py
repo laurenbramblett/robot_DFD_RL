@@ -12,6 +12,12 @@ def distance(point1,point2):
     point1 = np.array(point1)
     point2 = np.array(point2)
     return np.linalg.norm(point1-point2)
+def wrapToPi(angle):
+    if angle>m.pi:
+        angle-=2.0*m.pi
+    elif angle<-m.pi:
+        angle += 2.0*m.pi
+    return angle
 
 class Robot:
     def __init__(self,startpos,width,goal):
@@ -65,15 +71,14 @@ class Robot:
         if keys[0]:
             self.lin_v = self.maxspeed  
     def move_forces(self,angle):
-        self.ang_v = angle-self.heading
+        self.ang_v = wrapToPi(angle-self.heading)
         
     def kinematics(self,dt):
         self.x += (self.lin_v)*m.cos(self.heading)*dt
         self.y -= (self.lin_v)*m.sin(self.heading)*dt
         self.heading += (self.ang_v)*self.kp*dt
-        
-        if self.heading>2*m.pi or self.heading<-2*m.pi:
-            self.heading = 0
+        self.heading = wrapToPi(self.heading)
+
             
         self.lin_v = max(min(self.maxspeed,self.lin_v),self.minspeed)
         # self.vl = max(min(self.maxspeed,self.vl),self.minspeed)
@@ -110,6 +115,7 @@ class Robot:
         force_x = -10*obs_force_x+2.5*goal_force_x
         force_y = -10*obs_force_y+2.5*goal_force_y
         force_ang = m.atan2(force_y,force_x)
+        print(force_ang)
         if len(point_cloud)>0:
             observations = np.concatenate((distance_readings,
                                            [goal_dist,goal_ang,force_ang]))
