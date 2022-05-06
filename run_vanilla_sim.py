@@ -39,7 +39,7 @@ def run_vanilla_sim(model,scaler,batch_size,world,drawing):
     dt = 0.01
     observation_data = []
             
-    while running:# and frame<10000:
+    while running and frame<7000:
         frame += 1
     
         for event in pygame.event.get():
@@ -78,16 +78,16 @@ def run_vanilla_sim(model,scaler,batch_size,world,drawing):
         if distance((robot.x,robot.y),goal)<70:
             success = 1
             running = False
-        elif any(observations[:32]<50) or not obslen:
+        elif any(observations[:32]<50) or not obslen or frame>=7000:
             success = 0
             running = False
 
     pygame.quit()
     return frame, success
 
-# #Example
-# if __name__ == "__main__":
-#     model = keras.models.load_model('force_model_ang') 
-#     scaler = joblib.load('min_max_scaler_ang')
-#     frame,success = run_vanilla_sim(model, scaler, 64, 1, False) #Set drawing to false if no visual necessary
-#     print("Num Control Iterations: {}\nSuccess: {}".format(frame,(True if success else False)))
+#Example
+if __name__ == "__main__":
+    model = keras.models.load_model('force_model_ang') 
+    scaler = joblib.load('min_max_scaler_ang')
+    frame,success = run_vanilla_sim(model, scaler, 64, 1, True) #Set drawing to false if no visual necessary
+    print("Num Control Iterations: {}\nSuccess: {}".format(frame,(True if success else False)))
