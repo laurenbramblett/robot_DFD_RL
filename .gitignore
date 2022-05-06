@@ -5,3 +5,8 @@ ray_results/
 
 .ipynb_checkpoints/
 *.pyc
+*.png
+
+mlproject/
+
+pictures/matrixFile.png

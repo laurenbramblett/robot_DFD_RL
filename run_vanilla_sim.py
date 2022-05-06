@@ -38,8 +38,9 @@ def run_vanilla_sim(model,scaler,batch_size,world,drawing):
     frame = 0
     dt = 0.01
     observation_data = []
-            
-    while running and frame<7000:
+    max_frames=7000        
+    while running and frame<max_frames:
+
         frame += 1
     
         for event in pygame.event.get():
@@ -78,6 +79,7 @@ def run_vanilla_sim(model,scaler,batch_size,world,drawing):
         if distance((robot.x,robot.y),goal)<70:
             success = 1
             running = False
+
         elif any(observations[:32]<50) or not obslen or frame>=7000:
             success = 0
             running = False
