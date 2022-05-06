@@ -85,9 +85,9 @@ def run_vanilla_sim(model,scaler,batch_size,world,drawing):
     pygame.quit()
     return frame, success
 
-# #Example
-# if __name__ == "__main__":
-#     model = keras.models.load_model('force_model_ang') 
-#     scaler = joblib.load('min_max_scaler_ang')
-#     frame,success = run_vanilla_sim(model, scaler, 64, 1, False) #Set drawing to false if no visual necessary
-#     print("Num Control Iterations: {}\nSuccess: {}".format(frame,(True if success else False)))
+#Example
+if __name__ == "__main__":
+    model = keras.models.load_model('model_1_128_1_0.01_Adam') 
+    scaler = joblib.load('min_max_scaler_ang')
+    frame,success = run_vanilla_sim(model, scaler, 64, 1, True) #Set drawing to false if no visual necessary
+    print("Num Control Iterations: {}\nSuccess: {}".format(frame,(True if success else False)))

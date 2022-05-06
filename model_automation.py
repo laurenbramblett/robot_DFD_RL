@@ -21,6 +21,7 @@ plt.style.use('bmh')
 from tensorflow.compat.v1 import disable_eager_execution
 disable_eager_execution()
 
+import joblib
 
 draw=True
 train_frac=0.8 #fraction of data to train on
@@ -157,7 +158,9 @@ for b_sz in batch_sizes:
                 compile_params=[[],{'loss':'mean_squared_error', 'optimizer':opti, 'metrics':['mse']}]
                 model=createNN(layer_params=layers,compile_params=compile_params)
                 model.fit(Xtrn,ytrn,epochs=epochs,batch_size=b_sz)
-
+                model.save('model_%d_%s_%s_%s_%s'%(mn,b_sz,hl_scale,lr,opt))
+                joblib.dump(min_max_scaler, 'model_%d_min_max_scaler'%mn)
+                
                 _,trn_score=model.evaluate(Xtrn,ytrn)
 
                 _,test_score=model.evaluate(Xtst,ytst)
