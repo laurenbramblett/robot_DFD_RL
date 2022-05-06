@@ -50,31 +50,38 @@ def run_vanilla_sim(model,scaler,batch_size,world,drawing):
         
         point_cloud,ray_points = laser.sense_obstacles(robot.x,robot.y,robot.heading)
         observations = robot.collect_observations(point_cloud)
-      
-        obs = scaler.transform(observations.reshape(1,-1))
-        tmp = np.tile(np.transpose(obs), (batch_size,1))
-        angle = model.predict(tmp)[0,:]
-        f_inv = scaler.inverse_transform(np.concatenate((obs[0],angle)).reshape(1,-1))
-        robot.move_forces(f_inv[0,-1])#f_inv[:,-3:-1][0])
-        robot.kinematics(dt)
-        
-        #Draw sensor data & robot
-        if drawing:
-            gfx.draw_robot(robot.x,robot.y,robot.heading)
-            gfx.draw_sensor_data(point_cloud)
-            gfx.draw_lidar_rays(ray_points)
-            pygame.display.update()
-        
-        #Collect data
-        
-        observation_data.append(robot.collect_observations(point_cloud))
-        #observations stored as [distance_readings,self.x,self.y,goal_dist_x,goal_dist_y,force_x,force_y]
+        obslen=True
+        if len(observations)==35:
+
+
+            obs = scaler.transform((np.concatenate((observations,[1]))).reshape(1,-1))
+            tmp = np.tile(np.transpose(obs[0][:-2]), (batch_size,1))
+            angle = model.predict(tmp)[0,:]
+            f_inv = scaler.inverse_transform(np.concatenate((obs[0][:-2],angle,[1])).reshape(1,-1))
+            robot.move_forces(f_inv[0,-2])#f_inv[:,-3:-1][0])
+            robot.kinematics(dt)
+
+            #Draw sensor data & robot
+            if drawing:
+                gfx.draw_robot(robot.x,robot.y,robot.heading)
+                gfx.draw_sensor_data(point_cloud)
+                gfx.draw_lidar_rays(ray_points)
+                pygame.display.update()
+
+            #Collect data
+
+            observation_data.append(robot.collect_observations(point_cloud))
+            #observations stored as [distance_readings,self.x,self.y,goal_dist_x,goal_dist_y,force_x,force_y]
+        else:
+            obslen=False
+
         if distance((robot.x,robot.y),goal)<70:
             success = 1
             running = False
-        elif any(observations[:32]<50):
+        elif any(observations[:32]<50) or not obslen:
             success = 0
             running = False
+
     pygame.quit()
     return frame, success
 
