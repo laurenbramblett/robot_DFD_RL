@@ -21,7 +21,7 @@ mode = 'dnn' #Use 'human' for human play, 'force' for Potential field, ...
 
 #Define starting criteria
 map_dims = (900,1200)  
-goal=(1150,450)
+goal=(1100,450)
 map_matrix = draw_background(f,map_dims)
 drawing = True
 

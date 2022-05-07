@@ -10,7 +10,7 @@ import numpy as np
 def draw_background(map_path,map_dims):
     data = np.load(map_path)
     cushion = np.transpose(np.tile(np.concatenate(([1],np.repeat(0,data.shape[0]-2),[1])),(5,1)))
-    data2 = np.column_stack((np.ones((data.shape[0],1)),cushion,data,cushion))
+    data2 = np.column_stack((np.ones((data.shape[0],1)),cushion,data,cushion,np.ones((data.shape[0]))))
     pyplot.figure(figsize=(30,40))
     colormap = colors.ListedColormap(["white","black"])
     pyplot.imshow(data2,cmap = colormap)

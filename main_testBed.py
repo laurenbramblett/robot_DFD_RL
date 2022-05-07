@@ -25,7 +25,7 @@ for grid_num in range(0,300):
     f = 'grid_files/grid_%d.npy' % grid_num
     #Define starting criteria
     map_dims = (900,1200)  
-    goal=(1150,450)
+    goal=(1100,450)
     map_matrix = draw_background(f,map_dims)
     drawing = False
     if drawing:

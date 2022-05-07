@@ -23,20 +23,15 @@ disable_eager_execution()
 
 import joblib
 
-draw=True
+draw=False
 train_frac=0.8 #fraction of data to train on
 
 batch_sizes=[64,128]
 HL_scales=[1,2,4]
 optimizers=['Adam']
 learning_rates=[0.01,0.001]
+string_rates = ["0_01","0_001"]
 epochs=100
-
-batch_sizes=[128]
-HL_scales=[1]
-optimizers=['Adam']
-learning_rates=[0.01]
-epochs=10
 
 def createNN(layer_params=[],compile_params=[[],{'loss':'mean_squared_error', 'optimizer':'adam', 'metrics':['mse']}],model=Sequential):
     """Construct an arbitrary Keras layered model
@@ -144,7 +139,7 @@ score_dict={}
 mn=1
 for b_sz in batch_sizes:
     for hl_scale in HL_scales:
-        for lr in learning_rates:
+        for lr_idx,lr in enumerate(learning_rates):
             for opt in optimizers:
                 opti=None
                 if opt=='Adam': #This makes indexing easier later,
@@ -158,14 +153,14 @@ for b_sz in batch_sizes:
                 compile_params=[[],{'loss':'mean_squared_error', 'optimizer':opti, 'metrics':['mse']}]
                 model=createNN(layer_params=layers,compile_params=compile_params)
                 model.fit(Xtrn,ytrn,epochs=epochs,batch_size=b_sz)
-                model.save('model_%d_%s_%s_%s_%s'%(mn,b_sz,hl_scale,lr,opt))
+                model.save('model_%d_%s_%s_%s_%s'%(mn,b_sz,hl_scale,string_rates[lr_idx],opt))
                 joblib.dump(min_max_scaler, 'model_%d_min_max_scaler'%mn)
                 
                 _,trn_score=model.evaluate(Xtrn,ytrn)
 
                 _,test_score=model.evaluate(Xtst,ytst)
 
-                pf_sum,avg_ctrl_iters,pf_by_world,ctrl_iters_by_world=simulate_model(model,[1],min_max_scaler,b_sz,draw)
+                pf_sum,avg_ctrl_iters,pf_by_world,ctrl_iters_by_world=simulate_model(model,test_world_ids,min_max_scaler,b_sz,draw)
 
                 results[test_params]={'layers':layers,'model':model,
                                       'training score':trn_score,'test score':test_score,
