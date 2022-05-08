@@ -12,24 +12,26 @@ from tensorflow.keras.optimizers import SGD
 from run_vanilla_sim import run_vanilla_sim
 
 # from keras.wrappers.scikit_learn import KerasClassifier #Deprecated
-from scikeras.wrappers import KerasClassifier, KerasRegressor
+# from scikeras.wrappers import KerasClassifier, KerasRegressor
 
 
 import seaborn as sns
 import matplotlib.pyplot as plt
 plt.style.use('bmh')
+from tensorflow.compat.v1 import disable_eager_execution
+disable_eager_execution()
 
-
+import joblib
 
 draw=False
-train_frac=2/3 #fraction of data to train on
+train_frac=0.8 #fraction of data to train on
 
-batch_sizes=[32,64,128]
+batch_sizes=[64,128]
 HL_scales=[1,2,4]
-optimizers=['SGD','Adam']
-learning_rates=[0.1,0.01,0.001]
+optimizers=['Adam']
+learning_rates=[0.01,0.001]
+string_rates = ["0_01","0_001"]
 epochs=100
-
 
 def createNN(layer_params=[],compile_params=[[],{'loss':'mean_squared_error', 'optimizer':'adam', 'metrics':['mse']}],model=Sequential):
     """Construct an arbitrary Keras layered model
@@ -137,7 +139,7 @@ score_dict={}
 mn=1
 for b_sz in batch_sizes:
     for hl_scale in HL_scales:
-        for lr in learning_rates:
+        for lr_idx,lr in enumerate(learning_rates):
             for opt in optimizers:
                 opti=None
                 if opt=='Adam': #This makes indexing easier later,
@@ -151,7 +153,9 @@ for b_sz in batch_sizes:
                 compile_params=[[],{'loss':'mean_squared_error', 'optimizer':opti, 'metrics':['mse']}]
                 model=createNN(layer_params=layers,compile_params=compile_params)
                 model.fit(Xtrn,ytrn,epochs=epochs,batch_size=b_sz)
-
+                model.save('model_%d_%s_%s_%s_%s'%(mn,b_sz,hl_scale,string_rates[lr_idx],opt))
+                joblib.dump(min_max_scaler, 'model_%d_min_max_scaler'%mn)
+                
                 _,trn_score=model.evaluate(Xtrn,ytrn)
 
                 _,test_score=model.evaluate(Xtst,ytst)

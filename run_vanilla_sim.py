@@ -19,7 +19,7 @@ def run_vanilla_sim(model,scaler,batch_size,world,drawing):
     f = 'grid_files/grid_%d.npy' % world
     #Define starting criteria
     map_dims = (900,1200)  
-    goal=(1150,450)
+    goal=(1100,450)
     map_matrix = draw_background(f,map_dims)
     if drawing:
         pygame.init()
@@ -38,8 +38,9 @@ def run_vanilla_sim(model,scaler,batch_size,world,drawing):
     frame = 0
     dt = 0.01
     observation_data = []
-            
-    while running:# and frame<10000:
+    max_frames=7000        
+    while running and frame<max_frames:
+
         frame += 1
     
         for event in pygame.event.get():
@@ -52,8 +53,6 @@ def run_vanilla_sim(model,scaler,batch_size,world,drawing):
         observations = robot.collect_observations(point_cloud)
         obslen=True
         if len(observations)==35:
-
-
             obs = scaler.transform((np.concatenate((observations,[1]))).reshape(1,-1))
             tmp = np.tile(np.transpose(obs[0][:-2]), (batch_size,1))
             angle = model.predict(tmp)[0,:]
@@ -73,21 +72,23 @@ def run_vanilla_sim(model,scaler,batch_size,world,drawing):
             observation_data.append(robot.collect_observations(point_cloud))
             #observations stored as [distance_readings,self.x,self.y,goal_dist_x,goal_dist_y,force_x,force_y]
         else:
-            obslen=False
+            obslen = False
+
 
         if distance((robot.x,robot.y),goal)<70:
             success = 1
             running = False
-        elif any(observations[:32]<50) or not obslen:
+
+        elif any(observations[:32]<50) or not obslen or frame>=7000:
             success = 0
             running = False
 
     pygame.quit()
     return frame, success
 
-# #Example
-# if __name__ == "__main__":
-#     model = keras.models.load_model('force_model_ang') 
-#     scaler = joblib.load('min_max_scaler_ang')
-#     frame,success = run_vanilla_sim(model, scaler, 64, 1, False) #Set drawing to false if no visual necessary
-#     print("Num Control Iterations: {}\nSuccess: {}".format(frame,(True if success else False)))
+#Example
+if __name__ == "__main__":
+    model = keras.models.load_model('model_1_128_1_0_01_Adam') 
+    scaler = joblib.load('model_1_min_max_scaler')
+    frame,success = run_vanilla_sim(model, scaler, 128, 1, True) #Set drawing to false if no visual necessary
+    print("Num Control Iterations: {}\nSuccess: {}".format(frame,(True if success else False)))
